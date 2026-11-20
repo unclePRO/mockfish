@@ -20,10 +20,14 @@
 \usepackage{enumitem}
 \usepackage{fancyhdr}
 \usepackage{titlesec}
+\usepackage{float}       % [H] strict non-floating placement
 \usepackage{tocloft}
 
 \pgfplotsset{compat=1.18}
 \usetikzlibrary{shapes.geometric,arrows.meta,positioning,calc}
+
+% Prevent artificial vertical stretching between sections and floats
+\raggedbottom
 
 % -----------------------------------------------------------------------------
 % Color Palette Definition
@@ -112,10 +116,9 @@
     {\Huge\bfseries\color{primaryblue} MOCKFISH \par}
     \vspace{0.4cm}
     {\LARGE\bfseries\color{darkslate} An Intelligent Knowledge-Guided Adversarial \\ Chess Engine \& Interactive GUI \par}
-    \vspace{1.6cm}
+    \vspace{1.5cm}
     
     % Course & Repository Box
-    \begin{center}
     \colorbox{lightgraybg}{
         \begin{minipage}{0.88\textwidth}
         \vspace{0.35cm}
@@ -129,17 +132,13 @@
         \vspace{0.35cm}
         \end{minipage}
     }
-    \end{center}
     
-    \vspace{1.6cm}
+    \vspace{1.5cm}
     
     % Team Members Table
     {\large\bfseries\color{primaryblue} Project Team Members \& System Allocations \par}
     \vspace{0.4cm}
     
-    \begin{table}[h!]
-    \centering
-    \small
     \renewcommand{\arraystretch}{1.35}
     \begin{tabularx}{0.96\textwidth}{l c Y l}
         \toprule
@@ -151,7 +150,6 @@
         \textbf{Aviral Pandey}& CS25B2054 & \textbf{GUI, Integrator \& Benchmark}: Canvas, Game Loop \& Metrics & \texttt{main.py}, \texttt{benchmark.py} \\
         \bottomrule
     \end{tabularx}
-    \end{table}
     
     \vfill
 \end{titlepage}
@@ -203,7 +201,7 @@ Although implemented as a classical board game, the underlying computational par
 We formally formulate chess as a discrete, deterministic, turn-based, zero-sum, perfect-information adversarial environment defined by the 7-tuple:
 $$\mathcal{M} = \langle S_0, Actions, Result, Constraints, Terminal\_Test, Utility, Heuristic \rangle$$
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \resizebox{0.96\textwidth}{!}{%
 \begin{tikzpicture}[
@@ -332,26 +330,36 @@ The static evaluation function calculates granular positional and dynamic featur
 \section{Empirical Performance Metrics \& Comparative Benchmarks}
 
 \subsection{Experimental Setup}
-Empirical evaluations were conducted on an AMD Ryzen / Windows platform using \texttt{benchmark.py}. We evaluated two representative game phases across depths 1 through 3:
-\begin{enumerate}
-    \item \textbf{Position A (Italian Game Middlegame)}: FEN \texttt{r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2N2N2/PPPP1PPP/R1BQK2R b KQkq - 5 4} (36 legal moves).
-    \item \textbf{Position B (Tactical Exchange Complex)}: FEN \texttt{r1b1k2r/pppp1ppp/8/4N3/1b1nn3/2N5/PPPP1PPP/R1BQKB1R w KQkq - 0 7} (35 legal moves).
+Empirical evaluations were conducted on an AMD Ryzen / Windows platform using the standalone benchmark engine \texttt{benchmark.py}. We evaluated two standardized game phases across search depths 1 through 3:
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Position A (Italian Game Middlegame)}:
+    \begin{itemize}[leftmargin=1.5em]
+        \item \textbf{FEN}: \texttt{r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/} \\
+              \hspace*{0.9cm}\texttt{2N2N2/PPPP1PPP/R1BQK2R b KQkq - 5 4}
+        \item \textbf{State Complexity}: 36 legal candidate moves available.
+    \end{itemize}
+    \item \textbf{Position B (Tactical Exchange Complex)}:
+    \begin{itemize}[leftmargin=1.5em]
+        \item \textbf{FEN}: \texttt{r1b1k2r/pppp1ppp/8/4N3/1b1nn3/} \\
+              \hspace*{0.9cm}\texttt{2N5/PPPP1PPP/R1BQKB1R w KQkq - 0 7}
+        \item \textbf{State Complexity}: 35 legal candidate moves available.
+    \end{itemize}
 \end{enumerate}
 
 \subsection{Empirical Benchmark Results Table}
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Empirical Benchmark Metrics Across Search Algorithms and Depths.}
 \label{tab:benchmark_results}
 \small
 \renewcommand{\arraystretch}{1.2}
-\begin{tabularx}{\textwidth}{llcrrr}
+\begin{tabularx}{\textwidth}{@{} L{2.5cm} Y C{0.9cm} R{1.6cm} R{1.6cm} R{1.6cm} @{}}
 \toprule
-\textbf{Test Position} & \textbf{Algorithm} & \textbf{Depth} & \textbf{Nodes Explored} & \textbf{Time (ms)} & \textbf{Branching ($b_{eff}$)} \\
+\textbf{Test Position} & \textbf{Algorithm} & \textbf{Depth} & \textbf{Nodes} & \textbf{Time (ms)} & \textbf{Branching ($b_{eff}$)} \\
 \midrule
-\textbf{Tactical Exchange} & Pure Minimax (Exhaustive) & 1 & 36 & 22.52 & 36.00 \\
-& Alpha-Beta (Unordered) & 1 & 36 & 31.87 & 36.00 \\
+\textbf{Tactical} & Pure Minimax (Exhaustive) & 1 & 36 & 22.52 & 36.00 \\
+\textbf{Exchange} & Alpha-Beta (Unordered) & 1 & 36 & 31.87 & 36.00 \\
 & \textbf{Alpha-Beta + Move Ordering} & \textbf{1} & \textbf{36} & \textbf{26.35} & \textbf{36.00} \\
 & Iterative Deepening (IDDFS) & 1 & 35 & 22.11 & 35.00 \\
 \cmidrule{2-6}
@@ -380,7 +388,7 @@ Empirical evaluations were conducted on an AMD Ryzen / Windows platform using \t
     \item \textbf{Branching Factor Reduction}: Effective branching factor ($b_{eff} = N^{1/d}$) shrank from $37.35$ down to $7.23$, approaching the theoretical best-case limit ($\sqrt{b} \approx \sqrt{36} = 6$).
 \end{enumerate}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \begin{tikzpicture}
 \begin{axis}[
@@ -389,15 +397,15 @@ Empirical evaluations were conducted on an AMD Ryzen / Windows platform using \t
     ylabel={Nodes Explored ($\log_{10}$ Scale)},
     symbolic x coords={PureMinimax, ABUnordered, IDDFS, ABMoveOrdering},
     xticklabels={Pure Minimax, {Alpha-Beta (Unordered)}, IDDFS, {Alpha-Beta + Move Ordering}},
-    x tick label style={font=\footnotesize, rotate=15, anchor=north east},
+    x tick label style={font=\footnotesize, rotate=12, anchor=north east},
     xtick=data,
     nodes near coords,
     nodes near coords style={font=\scriptsize},
     ymin=100, ymax=120000,
     ymode=log,
-    bar width=20pt,
-    width=0.92\textwidth,
-    height=6.2cm,
+    bar width=18pt,
+    width=0.94\textwidth,
+    height=5.2cm,
     grid=major,
     grid style={dashed, gray!30}
 ]
@@ -420,13 +428,13 @@ Empirical evaluations were conducted on an AMD Ryzen / Windows platform using \t
 
 Course guidelines require justifying why Mockfish utilizes a \textbf{Hybrid Knowledge-Guided Alpha-Beta Search with Dynamic Heuristics} rather than other AI techniques:
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Comparative Matrix: Why Mockfish Selected Alpha-Beta Over Other AI Methods.}
 \label{tab:algorithm_justification}
 \small
-\renewcommand{\arraystretch}{1.3}
-\begin{tabularx}{\textwidth}{L{3.0cm} Y Y}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\textwidth}{@{} L{2.8cm} Y Y @{}}
 \toprule
 \textbf{Alternative AI Technique} & \textbf{Theoretical Capabilities} & \textbf{Justification for Rejection in This Domain} \\
 \midrule
@@ -477,13 +485,13 @@ We resolved this by developing an \textbf{in-canvas Game Over overlay card}:
 
 To eliminate merge conflicts during development, the codebase was partitioned into four modular, decoupled layers:
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Team Member Role Assignments and Detailed Technical Contributions.}
 \label{tab:team_division}
 \small
-\renewcommand{\arraystretch}{1.3}
-\begin{tabularx}{\textwidth}{L{3.0cm} L{3.6cm} Y}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{@{} L{3.0cm} L{3.6cm} Y @{}}
 \toprule
 \textbf{Team Member} & \textbf{Assigned Module} & \textbf{Key Responsibilities \& Implemented Algorithms} \\
 \midrule
