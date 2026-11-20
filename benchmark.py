@@ -1,25 +1,11 @@
-"""benchmark.py - Comparative Empirical Analysis of AI Search Algorithms
-=======================================================================
-Project: Mockfish AI Chess Engine
-Purpose: Compares performance metrics (execution time, explored nodes,
-         effective branching factor, and pruning efficiency) across:
-         1. Pure Minimax (Unpruned Exhaustive Search)
-         2. Alpha-Beta Pruning (Default Move Ordering)
-         3. Alpha-Beta Pruning + Heuristic Move Ordering (MVV-LVA, PST, Checks)
-         4. Iterative Deepening Depth-First Search (IDDFS)
-"""
-
 import time
 import math
 import chess
 
 from heuristics import evaluate_board, CHECKMATE_SCORE
-from search import order_moves
+from search import sortMoves as order_moves
 
-
-# ---------------------------------------------------------------------------
 # Algorithm 1: Pure Minimax (Unpruned Exhaustive Game Tree Search)
-# ---------------------------------------------------------------------------
 minimax_nodes = 0
 
 def minimax_raw(board: chess.Board, depth: int, is_max: bool) -> float:
@@ -53,9 +39,7 @@ def minimax_raw(board: chess.Board, depth: int, is_max: bool) -> float:
         return min_eval
 
 
-# ---------------------------------------------------------------------------
 # Algorithm 2: Alpha-Beta Pruning (Unordered / Arbitrary Move Order)
-# ---------------------------------------------------------------------------
 ab_unordered_nodes = 0
 
 def alpha_beta_unordered(board: chess.Board, depth: int, alpha: float, beta: float, is_max: bool) -> float:
@@ -95,9 +79,7 @@ def alpha_beta_unordered(board: chess.Board, depth: int, alpha: float, beta: flo
         return min_eval
 
 
-# ---------------------------------------------------------------------------
 # Algorithm 3: Alpha-Beta Pruning + Heuristic Move Ordering (Mockfish Core)
-# ---------------------------------------------------------------------------
 ab_ordered_nodes = 0
 
 def alpha_beta_ordered(board: chess.Board, depth: int, alpha: float, beta: float, is_max: bool) -> float:
@@ -137,9 +119,7 @@ def alpha_beta_ordered(board: chess.Board, depth: int, alpha: float, beta: float
         return min_eval
 
 
-# ---------------------------------------------------------------------------
 # Algorithm 4: Iterative Deepening Depth-First Search (IDDFS)
-# ---------------------------------------------------------------------------
 iddfs_nodes = 0
 
 def iterative_deepening(board: chess.Board, max_depth: int) -> tuple[chess.Move, float, int]:
@@ -181,9 +161,7 @@ def iterative_deepening(board: chess.Board, max_depth: int) -> tuple[chess.Move,
     return best_move, best_eval, iddfs_nodes
 
 
-# ---------------------------------------------------------------------------
 # Benchmark Runner
-# ---------------------------------------------------------------------------
 def run_benchmarks():
     global minimax_nodes, ab_unordered_nodes, ab_ordered_nodes
 
@@ -192,9 +170,7 @@ def run_benchmarks():
         ("Tactical Exchange Position", chess.Board("r1b1k2r/pppp1ppp/8/4N3/1b1nn3/2N5/PPPP1PPP/R1BQKB1R w KQkq - 0 7")),
     ]
 
-    print("=========================================================================================")
-    print("                     MOCKFISH ALGORITHM PERFORMANCE COMPARISON                           ")
-    print("=========================================================================================")
+    print(" MOCKFISH ALGORITHM PERFORMANCE COMPARISON ")
 
     for pos_name, board in test_positions:
         print(f"\n--- Testing Position: {pos_name} ---")
@@ -235,9 +211,6 @@ def run_benchmarks():
             t_iddfs = (time.perf_counter() - t0) * 1000
             b_iddfs = iddfs_total_nodes ** (1.0 / depth) if depth > 0 else 1.0
             print(f"{'Iterative Deepening DFS (IDDFS)':<36} | {depth:<5} | {iddfs_total_nodes:<10} | {t_iddfs:<10.2f} | {b_iddfs:.2f}")
-
-            print("-----------------------------------------------------------------------------------------")
-
 
 if __name__ == "__main__":
     run_benchmarks()
